@@ -1,0 +1,5 @@
+#!/bin/bash
+# Install Wiki.JS
+docker pull requarks/wiki:2.5
+docker run -d -p 8080:3000 --name wiki --restart unless-stopped \
+-e "DB_TYPE=sqlite" requarks/wiki:2.5
