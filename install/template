@@ -1,4 +1,0 @@
-#!/bin/bash
-# Description of the task
-echo "This example script does nothing, but showing this message. Please copy to use as a template."
-echo "  cp template newScript"
