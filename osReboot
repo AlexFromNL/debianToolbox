@@ -1,3 +1,0 @@
-#!/bin/bash
-# Reboot the OS 
-sudo shutdown -r -t 15 now
