@@ -1,3 +1,0 @@
-#!/bin/bash
-# Send Wake On LAN to the desktop computer
-wakeonlan b8:ae:ed:7a:e1:6b
