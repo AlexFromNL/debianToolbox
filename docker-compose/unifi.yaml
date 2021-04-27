@@ -1,0 +1,35 @@
+version: "3.5"
+services:
+
+  unifi:
+    image: ghcr.io/linuxserver/unifi-controller
+    container_name: unifi
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MEM_LIMIT=1024M #optional memory limit
+    volumes:
+      - unifi:/config
+#    networks:
+#      - frontend
+    ports:
+      - 3478:3478/udp #required STUN
+      - 8080:8080/tcp #required Device and controller communication
+      - 8443:8443/tcp #required HTTPS front-end
+#      - 8880:8880/tcp #optional HTTP front-end
+      - 10001:10001/udp #required Device discovery
+#      - 1900:1900/udp #optional L2 discovery
+#      - 5514:5514/tcp #optional Remote Syslog capture
+#      - 6789:6789/tcp #optional Unifi mobile speed test
+#      - 8843:8843/tcp #optional HTTPS front-end
+#      - 27117:27117/tcp #optional local-bound database communication
+#      - 5656-5699/udp #optional AP-EDU broadcasting
+    restart: unless-stopped
+
+volumes:
+  unifi:
+    name: unifi
+
+#networks:
+#  frontend:
+#    external: true
