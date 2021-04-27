@@ -1,0 +1,77 @@
+# start a docker-compose file with 
+#    docker-compose -f filename.yml <up|down> [-d]
+
+# replace place-holders in template with 
+#    sed -i 's/<service-name>/newname/g'
+#    sed -i 's/<image-name>/newname/g'
+#    sed -i 's/<domain-name>/newname/g'
+#    sed -i 's/<target-port>/portnumber/g'
+
+# use environment variables to pass sensitive data
+#    
+
+version: "3.5"
+services:
+
+  <service-name>:
+    image: "<image-name>"
+    container_name: "<service-name>"
+    volumes:
+      - "<service-name>:/data" # bind folder to volume example
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro" # bind the docker API socket
+#      - "/etc/localtime:/etc/localtime:ro" # the host timezone
+    networks:
+      - "<service-name>"
+#      - "frontend"
+#      - "backend"
+#    expose:
+#      - "80/tcp" # required http
+#      - "443/tcp" # optional https
+#    ports:
+#      - "80:80/tcp" # required http
+#      - "443:443/tcp" # optional https
+#    environment:
+#      - "PUID=<puid>" # runtime user ID
+#      - "PGID=<pgid>" # runtime group ID
+#      - "TZ=<timezone>" # if else then UTC
+#    depends_on:
+#      - "service"
+#    devices:
+#      - "/dev/ttyUSB0:/dev/ttyUSB0"
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost"]
+#      interval: 1m30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 40s
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.50'
+#          memory: 50M
+#        reservations:
+#          cpus: '0.25'
+#          memory: 20M
+    labels:
+      - "traefik.enable=true" # overrides exposedByDefault 
+      - "traefik.http.routers.<service-name>.rule=Host(`<service-name>.<domain-name>`)" # match domain
+      - "traefik.http.services.<service-name>.loadbalancer.server.port=<target-port>" 
+#      - "traefik.http.routers.<service-name>.entrypoints=web, web-secure"  # used http entry points
+#      - "traefik.http.routers.<service-name>.rule=PathPrefix(`/path`)" # match paths starting with
+#      - "traefik.http.routers.<service-name>.rule=Path(`/path`)" # match exact paths
+#      - "traefik.docker.network=frontend" # overrides default network, use when multiple networks
+    restart: unless-stopped
+
+volumes:
+  <service-name>:
+    name: "<service-name>"
+
+networks:
+  <service-name>:
+    external: false # is the network defined outside this docker-compose?
+
+#  frontend:
+#    external: true # is the network defined outside this docker-compose?
+
+#  backend:
+#    external: true # is the network defined outside this docker-compose?
