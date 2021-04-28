@@ -1,8 +1,8 @@
-# Set ENVIRONMENT VARIABLES
+# Set environment variables
 #
-# export TRAEFIK_PILOT_TOKEN=
-# export TRAEFIK_RESOLVER_EMAIL=
-# export TRAEFIK_DOMAIN=
+# TRAEFIK_PILOT_TOKEN=
+# TRAEFIK_RESOLVER_EMAIL=
+# TRAEFIK_DOMAIN=
 #
 # https://docs.docker.com/compose/environment-variables
 # https://wiki.debian.org/EnvironmentVariables
