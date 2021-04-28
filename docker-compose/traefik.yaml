@@ -1,8 +1,11 @@
+# To start a docker-compose file 
+#    docker-compose -f filename.yaml <up|down> [-d]
+
 # Set environment variables
 #
-# TRAEFIK_PILOT_TOKEN=
-# TRAEFIK_RESOLVER_EMAIL=
-# TRAEFIK_DOMAIN=
+#   TRAEFIK_PILOT_TOKEN=
+#   TRAEFIK_RESOLVER_EMAIL=
+#   TRAEFIK_DOMAIN=
 #
 # https://docs.docker.com/compose/environment-variables
 # https://wiki.debian.org/EnvironmentVariables
