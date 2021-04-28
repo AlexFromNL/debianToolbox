@@ -1,0 +1,41 @@
+# Set ENVIRONMENT VARIABLES
+#
+# export TRAEFIK_PILOT_TOKEN=
+# export TRAEFIK_RESOLVER_EMAIL=
+# export TRAEFIK_DOMAIN=
+#
+# https://docs.docker.com/compose/environment-variables
+# https://wiki.debian.org/EnvironmentVariables
+
+version: "3.5"
+
+services:
+
+  traefik:
+    image: "traefik"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--pilot.token=${TRAEFIK_PILOT_TOKEN:-abcd1234-abcd-1234-abcd-12345678abcd}"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_RESOLVER_EMAIL:-youremail@yourdomain.xyz}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  whoami:
+    image: "traefik/whoami"
+    container_name: "whoami"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.${TRAEFIK_DOMAIN:-yourdomain.xyz}`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
