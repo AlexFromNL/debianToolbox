@@ -1,6 +1,8 @@
 # To start a docker-compose file 
 #    docker-compose -f filename.yaml <up|down> [-d]
 
+
+
 # Set environment variables
 #
 #   TRAEFIK_PILOT_TOKEN=
@@ -37,8 +39,29 @@ services:
   whoami:
     image: "traefik/whoami"
     container_name: "whoami"
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+
+  portainer:
+    image: "portainer/portainer-ce"
+    container_name: "portainer"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"  # overrides exposedByDefault setting
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${TRAEFIK_DOMAIN}`)"  # match domain
+      - "traefik.http.routers.portainer.entrypoints=websecure"  # used http entry point(s)
+      - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    volumes:  # volume and file binds
+      - "portainer:/data" # bind folder to volume example
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" # bind the docker API socket
+
+
+volumes:  # create data volume(s)
+
+  portainer:
+    name: "portainer"
