@@ -41,7 +41,8 @@ services:
     image: "traefik/whoami"
     container_name: "whoami"
     restart: unless-stopped
-    networks: "backend"
+    networks: 
+      - "backend"
     labels:
       - "traefik.enable=true" 
       - "traefik.http.routers.whoami.rule=Host(`whoami.${TRAEFIK_DOMAIN}`)" 
@@ -53,7 +54,8 @@ services:
     image: "portainer/portainer-ce"
     container_name: "portainer"
     restart: unless-stopped
-    networks: "backend"
+    networks: 
+      - "backend"
     labels:
       - "traefik.enable=true" 
       - "traefik.http.routers.portainer.rule=Host(`portainer.${TRAEFIK_DOMAIN}`)"
