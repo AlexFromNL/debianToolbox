@@ -17,6 +17,7 @@ services:
   traefik:
     image: "traefik"
     container_name: "traefik"
+    restart: unless-stopped
     command:
       #- "--log.level=DEBUG"
       - "--api.insecure=true"
@@ -30,6 +31,8 @@ services:
     ports:
       - "443:443/tcp"
       - "8080:8080/tcp"
+    networks:
+      - "frontend"
     volumes:
       - "~/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -44,6 +47,7 @@ services:
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
       - "traefik.http.services.whoami.loadbalancer.server.port=80"
+      - "traefik.docker.network=backend"
 
   portainer:
     image: "portainer/portainer-ce"
@@ -55,12 +59,22 @@ services:
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.docker.network=backend"
     volumes:  
       - "portainer:/data" 
       - "/var/run/docker.sock:/var/run/docker.sock:ro" 
 
 
-volumes:  # create data volume(s)
+volumes:
 
   portainer:
     name: "portainer"
+
+
+networks:
+
+  backend:
+    external: false
+    
+  frontend:
+    external: false
