@@ -29,17 +29,17 @@ services:
       - "traefik.http.services.${DOCKER_SERVICE_NAME}.loadbalancer.server.port=8000"  # traefik: service name and port to expose container
 #      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=PathPrefix(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for path prefix matching
 #      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Path(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for exact path matching
+    networks:  # connected networks
+      - "backend"
+#    ports:  # to expose ports to host network
+#      - "80:80/tcp"  # expose http tcp ports
+#      - "443:443/tcp"  # expose https tcp ports
 #    volumes:  # to bind volume and file
 #      - "${DOCKER_SERVICE_NAME}:/data" # bind folder to volume example
 #      - "/var/run/docker.sock:/var/run/docker.sock:ro" # bind the docker API socket
 #      - "/etc/localtime:/etc/localtime:ro" # the host timezone
 #    devices:  # to bind hardware
 #      - "/dev/ttyUSB0:/dev/ttyUSB0"
-#    ports:  # to expose ports to host network
-#      - "80:80/tcp"  # expose http tcp ports
-#      - "443:443/tcp"  # expose https tcp ports
-#    networks:  # connected networks
-#      - "backend"
 #    environment:  # add container environment values 
 #      - "TZ=<timezone>" # if else then UTC
 #      - "PUID=<puid>" # runtime user ID
@@ -57,6 +57,8 @@ services:
 # networks:  # create or declare network(s)
 #
 #   ${DOCKER_SERVICE_NAME}:  # network name
+#     name: "${DOCKER_SERVICE_NAME}"
 #     external: false  # is the network defined outside this docker-compose file?
 #   backend:  # network name
+#     name: "backend"
 #     external: true  # is the network defined outside this docker-compose file?
