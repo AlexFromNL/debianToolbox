@@ -27,13 +27,13 @@ services:
       - "traefik.http.routers.${DOCKER_SERVICE_NAME}.entrypoints=websecure"  # traefik: entrypoint to expose container
       - "traefik.http.routers.${DOCKER_SERVICE_NAME}.tls.certresolver=letsencrypt"  # traefik: tls resolver for service name
       - "traefik.http.services.${DOCKER_SERVICE_NAME}.loadbalancer.server.port=8000"  # traefik: service name and port to expose container
-#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=PathPrefix(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for path prefix matching
 #      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Path(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for exact path matching
+#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=PathPrefix(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for path prefix matching
     networks:  # connected networks
       - "backend"
 #    ports:  # to expose ports to host network
-#      - "80:80/tcp"  # expose http tcp ports
-#      - "443:443/tcp"  # expose https tcp ports
+#      - "80:80/tcp"  # http
+#      - "443:443/tcp"  # https
 #    volumes:  # to bind volume and file
 #      - "${DOCKER_SERVICE_NAME}:/data" # bind folder to volume example
 #      - "/var/run/docker.sock:/var/run/docker.sock:ro" # bind the docker API socket
@@ -44,21 +44,23 @@ services:
 #      - "TZ=<timezone>" # if else then UTC
 #      - "PUID=<puid>" # runtime user ID
 #      - "PGID=<pgid>" # runtime group ID
+#      - "MEM_LIMIT=1024M" # limit memory use 
 #    depends_on:  # will only start if services below are running
 #      - "service"
 
 
 # volumes:  # create data volume(s)
-#
+
 #   ${DOCKER_SERVICE_NAME}:  # volume
 #     name: "${DOCKER_SERVICE_NAME}"  # volume name
 
 
 # networks:  # create or declare network(s)
-#
-#   ${DOCKER_SERVICE_NAME}:  # network name
-#     name: "${DOCKER_SERVICE_NAME}"
+
+#   ${DOCKER_SERVICE_NAME}:  
+#     name: "${DOCKER_SERVICE_NAME}"  # network name
 #     external: false  # is the network defined outside this docker-compose file?
-#   backend:  # network name
+
+#   backend:  
 #     name: "backend"
-#     external: true  # is the network defined outside this docker-compose file?
+#     external: true  
