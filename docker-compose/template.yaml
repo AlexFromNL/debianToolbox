@@ -1,15 +1,15 @@
 # To start a docker-compose file 
-#    docker-compose -f filename.yaml <up|down> [-d]
+#    docker-compose -f template.yaml <up|down> [-d]
 
-# To replace place-holders in file 
-#    sed -i 's/oldtext/newname/g'
+# To replace text in file 
+#    sed -i 's/oldtext/newname/g' template.yaml
 
 # Set environment variables
 #
-#    DOCKER_SERVICE_NAME=
-#    DOCKER_IMAGE_NAME=
-#    TRAEFIK_DOMAIN=
-#
+#    export "DOCKER_SERVICE_NAME=your-service"
+#    export "DOCKER_IMAGE_NAME=account/image-name"
+#    export "TRAEFIK_DOMAIN=your-domain.com"
+
 # https://docs.docker.com/compose/environment-variables
 # https://wiki.debian.org/EnvironmentVariables
 
@@ -22,25 +22,25 @@ services:
     container_name: "${DOCKER_SERVICE_NAME}"
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"  # overrides exposedByDefault setting
-      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Host(`${DOCKER_SERVICE_NAME}.${TRAEFIK_DOMAIN}`)"  # match domain
-      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.entrypoints=websecure"  # used http entry point(s)
-      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.tls.certresolver=letsencrypt"
-#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=PathPrefix(`/${DOCKER_SERVICE_NAME}`)" # match paths starting with
-#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Path(`/${DOCKER_SERVICE_NAME}`)" # match exact paths
-#    volumes:  # volume and file binds
+      - "traefik.enable=true"  # traefik: override default expose setting
+      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Host(`${DOCKER_SERVICE_NAME}.${TRAEFIK_DOMAIN}`)"  # traefik: rule for domain matching
+      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.entrypoints=websecure"  # traefik: entrypoint to expose container
+      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.tls.certresolver=letsencrypt"  # traefik: tls resolver for service name
+      - "traefik.http.services.${DOCKER_SERVICE_NAME}.loadbalancer.server.port=8000"  # traefik: service name and port to expose container
+#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=PathPrefix(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for path prefix matching
+#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Path(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for exact path matching
+#    volumes:  # to bind volume and file
 #      - "${DOCKER_SERVICE_NAME}:/data" # bind folder to volume example
 #      - "/var/run/docker.sock:/var/run/docker.sock:ro" # bind the docker API socket
 #      - "/etc/localtime:/etc/localtime:ro" # the host timezone
-#    devices:  # hardware binds
+#    devices:  # to bind hardware
 #      - "/dev/ttyUSB0:/dev/ttyUSB0"
 #    ports:  # to expose ports to host network
-#      - "80:80/tcp"  # required http
-#      - "443:443/tcp"  # optional https
+#      - "80:80/tcp"  # expose http tcp ports
+#      - "443:443/tcp"  # expose https tcp ports
 #    networks:  # connected networks
-#      - "frontend"
 #      - "backend"
-#    environment:
+#    environment:  # add container environment values 
 #      - "TZ=<timezone>" # if else then UTC
 #      - "PUID=<puid>" # runtime user ID
 #      - "PGID=<pgid>" # runtime group ID
@@ -50,14 +50,13 @@ services:
 
 # volumes:  # create data volume(s)
 #
-#   ${DOCKER_SERVICE_NAME}:
-#     name: "${DOCKER_SERVICE_NAME}"
+#   ${DOCKER_SERVICE_NAME}:  # volume
+#     name: "${DOCKER_SERVICE_NAME}"  # volume name
+
 
 # networks:  # create or declare network(s)
 #
-#   ${DOCKER_SERVICE_NAME}:
-#     external: false  # is the network defined outside this docker-compose?
-#   frontend:
-#     external: true  
-#   backend:
-#     external: true 
+#   ${DOCKER_SERVICE_NAME}:  # network name
+#     external: false  # is the network defined outside this docker-compose file?
+#   backend:  # network name
+#     external: true  # is the network defined outside this docker-compose file?
