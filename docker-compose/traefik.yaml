@@ -6,6 +6,8 @@
 #   TRAEFIK_PILOT_TOKEN=
 #   TRAEFIK_RESOLVER_EMAIL=
 #   TRAEFIK_DOMAIN=
+#   TRAEFIK_USER=
+#   TRAEFIK_PASS=
 
 # https://docs.docker.com/compose/environment-variables
 # https://wiki.debian.org/EnvironmentVariables
@@ -34,12 +36,20 @@ services:
     ports:
       - "80:80/tcp"
       - "443:443/tcp"
-      - "8080:8080/tcp"
     networks:
       - "frontend"
+      - "backend"
     volumes:
       - "~/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.middlewares=auth"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASS}"
 
   whoami:
     image: "traefik/whoami"
@@ -52,6 +62,7 @@ services:
       - "traefik.http.routers.whoami.rule=Host(`whoami.${TRAEFIK_DOMAIN}`)" 
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.whoami.middlewares=auth"
       - "traefik.http.services.whoami.loadbalancer.server.port=80"
 
   portainer:
@@ -65,6 +76,7 @@ services:
       - "traefik.http.routers.portainer.rule=Host(`portainer.${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portainer.middlewares=auth"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     volumes:  
       - "portainer:/data" 
