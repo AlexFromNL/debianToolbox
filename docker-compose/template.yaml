@@ -4,7 +4,7 @@
 # To replace text in file 
 #   sed -i 's/oldtext/newname/g' template.yaml
 
-# To set environment variables
+# To set environment variables (or use the .env file)
 #   export "DOCKER_SERVICE=service-name"
 #   export "DOCKER_IMAGE=account/image-name"
 #   export "DOCKER_NETWORK=docker-network-name"
