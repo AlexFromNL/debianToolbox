@@ -1,17 +1,17 @@
-# To start a docker-compose file 
-#   docker-compose -f filename.yaml <up|down> [-d]
+# Example to start a docker-compose file 
+#   docker-compose -f template.yaml <up|down> [-d]
 
-# To set environment variables
-#   export "TRAEFIK_TOKEN=<12345678-1234-1234-1234>"
-#   export "TRAEFIK_EMAIL=<your-resolver-email>"
-#   export "TRAEFIK_DOMAIN=<your-domain.com>" 
-#   export "TRAEFIK_USER=<your-username>"
-#   export "TRAEFIK_PASS=<your-md5-password>"
+# Example to replace text in file 
+#   sed -i 's/oldtext/newname/g' template.yaml
 
-# https://hub.docker.com/_/traefik
-# https://doc.traefik.io/traefik/v2.0/
-# https://docs.docker.com/compose/environment-variables
-# https://wiki.debian.org/EnvironmentVariables
+# Example to set environment variables
+#   export "TRAEFIK_DOMAIN=your-domain.com"
+
+# External links for additional information
+#   - https://docs.docker.com/compose/environment-variables
+#   - https://wiki.debian.org/EnvironmentVariables
+#   - https://hub.docker.com/_/traefik
+#   - https://doc.traefik.io/traefik/v2.0/
 
 version: "3.5"
 
