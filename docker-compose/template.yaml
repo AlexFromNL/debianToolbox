@@ -1,14 +1,15 @@
 # To start a docker-compose file 
-#    docker-compose -f template.yaml <up|down> [-d]
+#   docker-compose -f template.yaml <up|down> [-d]
 
 # To replace text in file 
-#    sed -i 's/oldtext/newname/g' template.yaml
+#   sed -i 's/oldtext/newname/g' template.yaml
 
-# Set environment variables
-#
-#    export "DOCKER_SERVICE_NAME=your-service"
-#    export "DOCKER_IMAGE_NAME=account/image-name"
-#    export "TRAEFIK_DOMAIN=your-domain.com"
+# To set environment variables
+#   export "DOCKER_SERVICE=service-name"
+#   export "DOCKER_IMAGE=account/image-name"
+#   export "DOCKER_NETWORK=docker-network-name"
+#   export "TRAEFIK_PORT=container-http-access-port"
+#   export "TRAEFIK_DOMAIN=your-domain.com"
 
 # https://docs.docker.com/compose/environment-variables
 # https://wiki.debian.org/EnvironmentVariables
@@ -16,51 +17,41 @@
 version: "3.5"
 
 services:
-
-  ${DOCKER_SERVICE_NAME}:
-    image: "${DOCKER_IMAGE_NAME}"
-    container_name: "${DOCKER_SERVICE_NAME}"
+  ${DOCKER_SERVICE}:
+    image: "${DOCKER_IMAGE}"
+    container_name: "${DOCKER_SERVICE}"
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"  # traefik: override default expose setting
-      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Host(`${DOCKER_SERVICE_NAME}.${TRAEFIK_DOMAIN}`)"  # traefik: rule for domain matching
-      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.entrypoints=websecure"  # traefik: entrypoint to expose container
-      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.tls.certresolver=letsencrypt"  # traefik: tls resolver for service name
-      - "traefik.http.services.${DOCKER_SERVICE_NAME}.loadbalancer.server.port=8000"  # traefik: service name and port to expose container
-#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=Path(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for exact path matching
-#      - "traefik.http.routers.${DOCKER_SERVICE_NAME}.rule=PathPrefix(`/${DOCKER_SERVICE_NAME}`)"  # traefik: rule for path prefix matching
-    networks:  # connected networks
-      - "backend"
-#    ports:  # to expose ports to host network
-#      - "80:80/tcp"  # http
-#      - "443:443/tcp"  # https
-#    volumes:  # to bind volume and file
-#      - "${DOCKER_SERVICE_NAME}:/data" # bind folder to volume example
-#      - "/var/run/docker.sock:/var/run/docker.sock:ro" # bind the docker API socket
-#      - "/etc/localtime:/etc/localtime:ro" # the host timezone
-#    devices:  # to bind hardware
+    networks: 
+      - "${DOCKER_NETWORK}"
+#    ports:  
+#      - "80:80/tcp"
+#      - "443:443/tcp"
+    volumes:
+      - "${DOCKER_SERVICE}:/data"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#    devices:  
 #      - "/dev/ttyUSB0:/dev/ttyUSB0"
-#    environment:  # add container environment values 
-#      - "TZ=<timezone>" # if else then UTC
-#      - "PUID=<puid>" # runtime user ID
-#      - "PGID=<pgid>" # runtime group ID
-#      - "MEM_LIMIT=1024M" # limit memory use 
-#    depends_on:  # will only start if services below are running
-#      - "service"
+    labels: 
+      - "traefik.enable=true" 
+      - "traefik.docker.network=${DOCKER_NETWORK}" 
+      - "traefik.http.routers.${DOCKER_SERVICE}.rule=Host(`${DOCKER_SERVICE}.${TRAEFIK_DOMAIN}`)" 
+      - "traefik.http.routers.${DOCKER_SERVICE}.entrypoints=websecure" 
+      - "traefik.http.routers.${DOCKER_SERVICE}.tls.certresolver=letsencrypt" 
+      - "traefik.http.services.${DOCKER_SERVICE}.loadbalancer.server.port=${TRAEFIK_PORT}"
+#      - "traefik.http.routers.portainer.middlewares=auth"    
+    environment:
+#      - "TZ=<timezone>"
+#      - "PUID=<puid>"
+#      - "PGID=<pgid>"
+#      - "MEM_LIMIT=1024M" 
+#    depends_on:
+#      - "<service-name>"
 
+volumes:
+  ${DOCKER_SERVICE}:  
+    name: "${DOCKER_SERVICE}" 
 
-# volumes:  # create data volume(s)
-
-#   ${DOCKER_SERVICE_NAME}:  # volume
-#     name: "${DOCKER_SERVICE_NAME}"  # volume name
-
-
-# networks:  # create or declare network(s)
-
-#   ${DOCKER_SERVICE_NAME}:  
-#     name: "${DOCKER_SERVICE_NAME}"  # network name
-#     external: false  # is the network defined outside this docker-compose file?
-
-#   backend:  
-#     name: "backend"
-#     external: true  
+networks:
+  ${DOCKER_NETWORK}:  
+    name: "${DOCKER_NETWORK}"
+    external: true
