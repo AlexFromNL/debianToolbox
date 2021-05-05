@@ -1,21 +1,21 @@
 # To start a docker-compose file 
-#    docker-compose -f filename.yaml <up|down> [-d]
+#   docker-compose -f filename.yaml <up|down> [-d]
 
-# Set environment variables
-#
-#   TRAEFIK_PILOT_TOKEN=
-#   TRAEFIK_RESOLVER_EMAIL=
-#   TRAEFIK_DOMAIN=
-#   TRAEFIK_USER=
-#   TRAEFIK_PASS=
+# To set environment variables
+#   export "TRAEFIK_TOKEN=<12345678-1234-1234-1234>"
+#   export "TRAEFIK_EMAIL=<your-resolver-email>"
+#   export "TRAEFIK_DOMAIN=<your-domain.com>" 
+#   export "TRAEFIK_USER=<your-username>"
+#   export "TRAEFIK_PASS=<your-md5-password>"
 
+# https://hub.docker.com/_/traefik
+# https://doc.traefik.io/traefik/v2.0/
 # https://docs.docker.com/compose/environment-variables
 # https://wiki.debian.org/EnvironmentVariables
 
 version: "3.5"
 
 services:
-
   traefik:
     image: "traefik"
     container_name: "traefik"
@@ -29,21 +29,21 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
-      - "--pilot.token=${TRAEFIK_PILOT_TOKEN}"
+      - "--pilot.token=${TRAEFIK_TOKEN}"
       - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_RESOLVER_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_EMAIL}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80/tcp"
       - "443:443/tcp"
     networks:
       - "frontend"
-      - "backend"
     volumes:
-      - "~/letsencrypt:/letsencrypt"
+      - "letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=frontend"
       - "traefik.http.routers.traefik.rule=Host(`traefik.${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
@@ -51,32 +51,34 @@ services:
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASS}"
 
-  whoami:
-    image: "traefik/whoami"
-    container_name: "whoami"
-    restart: unless-stopped
-    networks: 
-      - "backend"
-    labels:
-      - "traefik.enable=true" 
-      - "traefik.http.routers.whoami.rule=Host(`whoami.${TRAEFIK_DOMAIN}`)" 
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.whoami.middlewares=auth"
-      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+#  whoami:
+#    image: "traefik/whoami"
+#    container_name: "whoami"
+#    restart: unless-stopped
+#    networks: 
+#      - "frontend"
+#    labels:
+#      - "traefik.enable=true" 
+#      - "traefik.docker.network=frontend"
+#      - "traefik.http.routers.whoami.rule=Host(`whoami.${TRAEFIK_DOMAIN}`)" 
+#      - "traefik.http.routers.whoami.entrypoints=websecure"
+#      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+#      - "traefik.http.routers.whoami.middlewares=auth"
+#      - "traefik.http.services.whoami.loadbalancer.server.port=80"
 
   portainer:
     image: "portainer/portainer-ce"
     container_name: "portainer"
     restart: unless-stopped
     networks: 
-      - "backend"
+      - "frontend"
     labels:
       - "traefik.enable=true" 
+      - "traefik.docker.network=frontend"
       - "traefik.http.routers.portainer.rule=Host(`portainer.${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.portainer.middlewares=auth"
+#      - "traefik.http.routers.portainer.middlewares=auth"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     volumes:  
       - "portainer:/data" 
@@ -84,17 +86,12 @@ services:
 
 
 volumes:
-
   portainer:
     name: "portainer"
-
+  letsencrypt:
+    name: "letsencrypt"
 
 networks:
-
-  backend:
-    name: "backend"
-    external: false
-    
   frontend:
     name: "frontend"
     external: false
