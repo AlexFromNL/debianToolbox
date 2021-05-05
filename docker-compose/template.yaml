@@ -1,18 +1,15 @@
-# To start a docker-compose file 
+# Example to start a docker-compose file 
 #   docker-compose -f template.yaml <up|down> [-d]
 
-# To replace text in file 
+# Example to replace text in file 
 #   sed -i 's/oldtext/newname/g' template.yaml
 
-# To set environment variables (or use the .env file)
-#   export "DOCKER_SERVICE=service-name"
-#   export "DOCKER_IMAGE=account/image-name"
-#   export "DOCKER_NETWORK=docker-network-name"
-#   export "TRAEFIK_PORT=container-http-access-port"
+# Example to set environment variables
 #   export "TRAEFIK_DOMAIN=your-domain.com"
 
-# https://docs.docker.com/compose/environment-variables
-# https://wiki.debian.org/EnvironmentVariables
+# External links for additional information
+#   - https://docs.docker.com/compose/environment-variables
+#   - https://wiki.debian.org/EnvironmentVariables
 
 version: "3.5"
 
@@ -23,12 +20,12 @@ services:
     restart: unless-stopped
     networks: 
       - "${DOCKER_NETWORK}"
-#    ports:  
-#      - "80:80/tcp"
-#      - "443:443/tcp"
     volumes:
       - "${DOCKER_SERVICE}:/data"
 #      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#    ports:  
+#      - "80:80/tcp"
+#      - "443:443/tcp"
 #    devices:  
 #      - "/dev/ttyUSB0:/dev/ttyUSB0"
     labels: 
@@ -39,11 +36,11 @@ services:
       - "traefik.http.routers.${DOCKER_SERVICE}.tls.certresolver=letsencrypt" 
       - "traefik.http.services.${DOCKER_SERVICE}.loadbalancer.server.port=${TRAEFIK_PORT}"
 #      - "traefik.http.routers.portainer.middlewares=auth"    
-    environment:
+#    environment:
+#      - "MEM_LIMIT=1024M" 
 #      - "TZ=<timezone>"
 #      - "PUID=<puid>"
 #      - "PGID=<pgid>"
-#      - "MEM_LIMIT=1024M" 
 #    depends_on:
 #      - "<service-name>"
 
@@ -55,3 +52,6 @@ networks:
   ${DOCKER_NETWORK}:  
     name: "${DOCKER_NETWORK}"
     external: true
+#  ${DOCKER_SERVICE}:
+#    name: "${DOCKER_SERVICE}"
+#    external: false
