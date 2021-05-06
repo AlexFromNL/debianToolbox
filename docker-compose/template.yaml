@@ -14,6 +14,7 @@
 version: "3.5"
 
 services:
+
   ${DOCKER_SERVICE}:
     image: "${DOCKER_IMAGE}"
     container_name: "${DOCKER_SERVICE}"
@@ -35,7 +36,7 @@ services:
       - "traefik.http.routers.${DOCKER_SERVICE}.entrypoints=websecure" 
       - "traefik.http.routers.${DOCKER_SERVICE}.tls.certresolver=letsencrypt" 
       - "traefik.http.services.${DOCKER_SERVICE}.loadbalancer.server.port=${TRAEFIK_PORT}"
-#      - "traefik.http.routers.portainer.middlewares=auth"    
+#      - "traefik.http.routers.${DOCKER_SERVICE}.middlewares=auth"    
 #    environment:
 #      - "MEM_LIMIT=1024M" 
 #      - "TZ=<timezone>"
@@ -45,13 +46,17 @@ services:
 #      - "<service-name>"
 
 volumes:
+
   ${DOCKER_SERVICE}:  
     name: "${DOCKER_SERVICE}" 
 
+
 networks:
+
   ${DOCKER_NETWORK}:  
     name: "${DOCKER_NETWORK}"
     external: true
+    
 #  ${DOCKER_SERVICE}:
 #    name: "${DOCKER_SERVICE}"
 #    external: false
