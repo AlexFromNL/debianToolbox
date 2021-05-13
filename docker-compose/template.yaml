@@ -1,8 +1,8 @@
 # Example to start a docker-compose file 
-#   docker-compose -f template.yaml <up|down> [-d]
+#   docker-compose -f templateFilename.yaml -p projectName <up|down> [-d]
 
-# Example to replace text in file 
-#   sed -i 's/oldtext/newname/g' template.yaml
+# Example to replace text in a file 
+#   sed -i 's/oldtext/newname/g' templateFilename.yaml
 
 # Example to set environment variables
 #   export "TRAEFIK_DOMAIN=your-domain.com"
@@ -14,45 +14,43 @@
 version: "3.5"
 
 services:
-
   ${DOCKER_SERVICE}:
-    image: "${DOCKER_IMAGE}"
-    container_name: "${DOCKER_SERVICE}"
+    image: ${DOCKER_IMAGE}
+    container_name: ${DOCKER_SERVICE}
     restart: unless-stopped
+#    depends_on:
+#      - <service-name>
     networks: 
-      - "${DOCKER_NETWORK}"
-    volumes:
-      - "${DOCKER_SERVICE}:/data"
-#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - ${DOCKER_NETWORK}
 #    ports:  
-#      - "80:80/tcp"
-#      - "443:443/tcp"
+#      - 80:80/tcp
+#      - 443:443/tcp
 #    devices:  
-#      - "/dev/ttyUSB0:/dev/ttyUSB0"
+#      - /dev/ttyUSB0:/dev/ttyUSB0
+    volumes:
+      - ${DOCKER_SERVICE}:/data"
+#      - /var/run/docker.sock:/var/run/docker.sock:ro # access to docker API
+#      - /etc/localtime:/etc/localtime:ro # access to host time
+#      - /etc/timezone:/etc/timezone:ro # access to host timezone
     labels: 
-      - "traefik.enable=true" 
-      - "traefik.docker.network=${DOCKER_NETWORK}" 
-      - "traefik.http.routers.${DOCKER_SERVICE}.rule=Host(`${DOCKER_SERVICE}.${TRAEFIK_DOMAIN}`)" 
-      - "traefik.http.routers.${DOCKER_SERVICE}.entrypoints=websecure" 
-      - "traefik.http.routers.${DOCKER_SERVICE}.tls.certresolver=letsencrypt" 
+      - "traefik.enable=true"
+      - "traefik.docker.network=${DOCKER_NETWORK}"
       - "traefik.http.services.${DOCKER_SERVICE}.loadbalancer.server.port=${TRAEFIK_PORT}"
-#      - "traefik.http.routers.${DOCKER_SERVICE}.middlewares=auth"    
+      - "traefik.http.routers.${DOCKER_SERVICE}.rule=Host(`${DOCKER_SERVICE}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${DOCKER_SERVICE}.entrypoints=websecure"
+      - "traefik.http.routers.${DOCKER_SERVICE}.tls.certresolver=letsencrypt"
+#      - "traefik.http.routers.${DOCKER_SERVICE}.middlewares=auth" # add traefik authentification
 #    environment:
-#      - "MEM_LIMIT=1024M" 
+#      - "MEM_LIMIT=1024M"
 #      - "TZ=<timezone>"
 #      - "PUID=<puid>"
 #      - "PGID=<pgid>"
-#    depends_on:
-#      - "<service-name>"
 
 volumes:
-
   ${DOCKER_SERVICE}:  
     name: "${DOCKER_SERVICE}" 
 
-
 networks:
-
   ${DOCKER_NETWORK}:  
     name: "${DOCKER_NETWORK}"
     external: true
