@@ -42,19 +42,18 @@ services:
 #      - "traefik.http.routers.${DOCKER_SERVICE}.middlewares=auth" # add traefik authentification
 #    environment:
 #      - "MEM_LIMIT=1024M"
-#      - "TZ=<timezone>"
 #      - "PUID=<puid>"
 #      - "PGID=<pgid>"
 
 volumes:
   ${DOCKER_SERVICE}:  
-    name: "${DOCKER_SERVICE}" 
+    name: ${DOCKER_SERVICE} 
 
 networks:
   ${DOCKER_NETWORK}:  
-    name: "${DOCKER_NETWORK}"
+    name: ${DOCKER_NETWORK}
     external: true
     
 #  ${DOCKER_SERVICE}:
-#    name: "${DOCKER_SERVICE}"
+#    name: ${DOCKER_SERVICE}
 #    external: false
